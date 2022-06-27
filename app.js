@@ -13,19 +13,40 @@
 // If you retreat, the game is over
 
 // Ship Properties
-// hull is the same as hitpoints. If hull reaches 0or less, the ship is destroyed
+// hull is the same as hitpoints. If hull reaches 0 or less, the ship is destroyed
 // firepower is the amount of damage done to the hull of the target with a successful hit
 // accuracy is the chance between 0 and 1 that the ship will hit its target
 
 // Create a class named Ship
 // Constructor method with properties hull, firepower, and accuracy
+class Ship {
+    constructor(name, hull, firepower, accuracy) {
+        this.name = name
+        this.hull = hull
+        this.firepower = firepower
+        this.accuracy = accuracy
+    }
 
 // ships attack each other until one of them has been destroyed
 // create an attack method with loops
 
+// Example use of accuracy to determine a hit:
+// if (Math.random() < alien[0].accuracy) {
+// 	console.log('You have been hit!');
+// }
+    
+    attack(target) {
+        if (Math.random() < this.accuracy) {
+            target.hull -= this.firepower
+            console.log(`${this.name} hit ${target.name}.`)
+            console.log(`${target.name} taken ${this.firepower} damage.`)
+            console.log(`${target.name} has ${target.hull} hull left.`)
+        } else {
+            console.log(`${this.name} has missed.`)
+        }
+    }
+}
 // If you destroy the ship, you have the option to attack the next ship or to retreat
-
-
 
 
 
@@ -37,8 +58,8 @@
 // accuracy - .7
 
 // Create a spaceship with the above properties
-
-
+const playerShip = new Ship('USS Assembly', 20, 5, .7)
+console.log(playerShip)
 // The alien ships should each have the following ranged properties determined randomly:
 
 // hull - between 3 and 6
@@ -47,7 +68,12 @@
 
 // Use a loop to create an array with 6 alien ships with ranged properties determined randomly
 
-// Example use of accuracy to determine a hit:
-// if (Math.random() < alien[0].accuracy) {
-// 	console.log('You have been hit!');
-// }
+const alienShips = []
+for (let i = 1; i < 7; i++) {
+    let hull = Math.floor(Math.random() * 4) + 3
+    let firepower = Math.floor(Math.random() * 3) + 2
+    let accuracy = Math.round(Math.random() * 2) / 10 + .6
+    let newAlienShip = new Ship('Alien Ship ' + i, hull, firepower, accuracy)
+    alienShips.push(newAlienShip)
+}
+console.log(alienShips)
