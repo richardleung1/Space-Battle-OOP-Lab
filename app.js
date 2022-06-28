@@ -37,10 +37,9 @@ class Ship {
     
     attack(target) {
         if (Math.random() < this.accuracy) {
-            target.hull -= this.firepower
+            target.hull = Math.max(0, target.hull - this.firepower)
             console.log(`${this.name} hit ${target.name}.`)
             console.log(`${target.name} taken ${this.firepower} damage.`)
-            console.log(`${target.name} has ${target.hull} hull left.`)
         } else {
             console.log(`${this.name} has missed.`)
         }
@@ -57,9 +56,9 @@ class Ship {
 // firepower - 5
 // accuracy - .7
 
+
 // Create a spaceship with the above properties
-const playerShip = new Ship('USS Assembly', 20, 5, .7)
-console.log(playerShip)
+const playerShip = new Ship('USS Schwarzenegger', 20, 5, .7)
 // The alien ships should each have the following ranged properties determined randomly:
 
 // hull - between 3 and 6
@@ -67,13 +66,85 @@ console.log(playerShip)
 // accuracy - between .6 and .8
 
 // Use a loop to create an array with 6 alien ships with ranged properties determined randomly
-
-const alienShips = []
-for (let i = 1; i < 7; i++) {
-    let hull = Math.floor(Math.random() * 4) + 3
-    let firepower = Math.floor(Math.random() * 3) + 2
-    let accuracy = Math.round(Math.random() * 2) / 10 + .6
-    let newAlienShip = new Ship('Alien Ship ' + i, hull, firepower, accuracy)
-    alienShips.push(newAlienShip)
+function createEnemies() {
+    const ships = []
+    for (let i = 1; i < 7; i++) {
+        let hull = Math.floor(Math.random() * 4) + 3
+        let firepower = Math.floor(Math.random() * 3) + 2
+        let accuracy = Math.round(Math.random() * 2) / 10 + .6
+        let newAlienShip = new Ship('Alien Ship ' + i, hull, firepower, accuracy)
+        ships.push(newAlienShip)
+    }
+    return ships
 }
-console.log(alienShips)
+let alienShips = []
+
+
+// function to change name and stats display
+function changeStats() {
+    const br = document.createElement("br")
+    playerName.textContent = playerShip.name
+    playerStats.textContent = `Hull:${playerShip.hull} FirePower:${playerShip.firepower} Accuracy:${playerShip.accuracy} `
+
+    alienName.textContent = alienShips[alienCount].name
+    alienStats.textContent = `Hull:${alienShips[alienCount].hull} FirePower:${alienShips[alienCount].firepower} Accuracy:${alienShips[alienCount].accuracy} `
+}
+
+function battle() {
+    playerStats.removeEventListener('click', battle)
+    while (playerShip.hull > 0 && alienShips[alienCount].hull > 0) {
+        playerShip.attack(alienShips[alienCount])
+        changeStats()
+        if (alienShips[alienCount].hull > 0) {
+            alienShips[alienCount].attack(playerShip)
+            changeStats()
+        }
+    }
+    if (playerShip.hull > 0 && alienShips[alienCount].hull === 0) {
+        alienCount++
+        if (alienCount < 6) {
+            continueBattle()
+        } else if (alienCount === 6) {
+            playerStats = 'Start'
+            playerStats.addEventListener('click', startGame)
+            alert(`Congratulations. You have destroyed all enemy alien ships.`)
+
+        }
+    } else if (playerShip.hull === 0){
+        alert('Game Over. You have lose.')
+    }
+}
+
+function continueBattle() {
+    if (alienCount === 1) {
+        console.log(`You have destroyed ${alienCount} alien ship. Continue or retreat?`)
+    } else {
+        console.log(`You have destroyed ${alienCount} alien ships. Continue or retreat?`)
+    }
+    
+    playerStats.textContent = 'Continue'
+    playerStats.addEventListener('click', battle)
+
+    alienStats.textContent = 'Retreat'
+    alienStats.addEventListener('click', retreat)
+}
+
+function retreat() {
+    console.log('You choose to retreat and survive. But at what cost?')
+}
+
+function startGame() {
+    alienCount = 0
+    alienShips = createEnemies()
+    playerStats.removeEventListener('click', startGame)
+    battle()
+}
+
+const playerName = document.querySelector('.playerNameBox')
+const playerStats = document.querySelector('.playerStats')
+playerStats.addEventListener('click', startGame)
+
+let alienCount = 0
+const alienName = document.querySelector('.enemyNameBox')
+const alienStats = document.querySelector('.enemyStats')
+
