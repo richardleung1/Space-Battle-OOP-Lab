@@ -37,11 +37,17 @@ class Ship {
     
     attack(target) {
         if (Math.random() < this.accuracy) {
-            target.hull = Math.max(0, target.hull - this.firepower)
-            console.log(`${this.name} hit ${target.name}.`)
-            console.log(`${target.name} taken ${this.firepower} damage.`)
+                target.hull = Math.max(0, target.hull - this.firepower)
+            setTimeout(() => {
+                alert(`${this.name} hit ${target.name}. ${target.name} taken ${this.firepower} damage.`)
+                changeStats()
+            }, 100);
+            
         } else {
-            console.log(`${this.name} has missed.`)
+            setTimeout(() => {
+                alert(`${this.name} has missed.`)
+            }, 100);
+            
         }
     }
 }
@@ -90,36 +96,57 @@ function changeStats() {
     alienStats.textContent = `Hull:${alienShips[alienCount].hull} FirePower:${alienShips[alienCount].firepower} Accuracy:${alienShips[alienCount].accuracy} `
 }
 
-function battle() {
-    playerStats.removeEventListener('click', battle)
-    while (playerShip.hull > 0 && alienShips[alienCount].hull > 0) {
-        playerShip.attack(alienShips[alienCount])
-        changeStats()
-        if (alienShips[alienCount].hull > 0) {
-            alienShips[alienCount].attack(playerShip)
-            changeStats()
-        }
-    }
-    if (playerShip.hull > 0 && alienShips[alienCount].hull === 0) {
-        alienCount++
-        if (alienCount < 6) {
-            continueBattle()
-        } else if (alienCount === 6) {
-            playerStats = 'Start'
-            playerStats.addEventListener('click', startGame)
-            alert(`Congratulations. You have destroyed all enemy alien ships.`)
+function playerAttack() {
+    playerShip.attack(alienShips[alienCount])
+}
 
+function enemyAttack() {
+    alienShips[alienCount].attack(playerShip)
+}
+
+function battle() {
+    changeStats()
+    playerStats.removeEventListener('click', battle)
+    alienStats.removeEventListener('click', retreat)
+    while (playerShip.hull > 0 && alienShips[alienCount].hull > 0) {
+        playerAttack()
+        if (alienShips[alienCount].hull > 0) {
+            enemyAttack()
         }
-    } else if (playerShip.hull === 0){
-        alert('Game Over. You have lose.')
     }
+    setTimeout(() => {
+        if (playerShip.hull > 0 && alienShips[alienCount].hull === 0) {
+            alienCount++
+            if (alienCount < 6) {
+                setTimeout(() => {
+                    continueBattle()
+                }, 5000);
+            } else if (alienCount === 6) {
+                setTimeout(() => {
+                    alert(`Congratulations. You have destroyed all enemy alien ships.`)
+                    location.reload()
+                }, 100);
+            }
+        } else if (playerShip.hull === 0){
+            setTimeout(() => {
+                alert('Your hull is 0. Game Over.')
+                location.reload()
+         }, 100);
+        }
+    }, 3000);
+    
 }
 
 function continueBattle() {
     if (alienCount === 1) {
-        console.log(`You have destroyed ${alienCount} alien ship. Continue or retreat?`)
-    } else {
-        console.log(`You have destroyed ${alienCount} alien ships. Continue or retreat?`)
+        setTimeout(() => {
+            alert(`You have destroyed ${alienCount} alien ship. Continue or retreat?`)
+        }, 100);
+        
+    } else if (alienCount >= 1){
+        setTimeout(() => {
+            alert(`You have destroyed ${alienCount} alien ships. Continue or retreat?`)
+        }, 100);
     }
     
     playerStats.textContent = 'Continue'
@@ -130,11 +157,13 @@ function continueBattle() {
 }
 
 function retreat() {
-    console.log('You choose to retreat and survive. But at what cost?')
+    setTimeout(() => {
+        alert('You choose to retreat and survive. But at what cost?')
+        location.reload()
+    }, 100);
 }
 
 function startGame() {
-    alienCount = 0
     alienShips = createEnemies()
     playerStats.removeEventListener('click', startGame)
     battle()
@@ -147,4 +176,3 @@ playerStats.addEventListener('click', startGame)
 let alienCount = 0
 const alienName = document.querySelector('.enemyNameBox')
 const alienStats = document.querySelector('.enemyStats')
-
